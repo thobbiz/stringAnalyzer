@@ -7,10 +7,12 @@ import (
 func main() {
 	router := gin.Default()
 	router.POST("/strings", createString)
+	router.GET("/strings/:string_value", getString)
+	router.GET("/strings", getStringWithParams)
 	router.Run(":7070")
 }
 
-var ObjectDB map[string]ObjectString
+var ObjectDB = make(map[string]ObjectString)
 
 type ObjectString struct {
 	Id         string     `json:"id"`
