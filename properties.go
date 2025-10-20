@@ -1,6 +1,9 @@
 package main
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
+	"fmt"
 	"regexp"
 	"strings"
 )
@@ -23,7 +26,7 @@ func is_palindrome(text string) bool {
 }
 
 func uniqueCharacters(text string) int {
-	re := regexp.MustCompile(`s+`)
+	re := regexp.MustCompile(`\s+`)
 	text = re.ReplaceAllString(text, "")
 
 	countMap := make(map[rune]bool)
@@ -36,7 +39,7 @@ func uniqueCharacters(text string) int {
 func wordCount(text string) int {
 	text = strings.TrimSpace(text)
 
-	if len(text) == 0 {
+	if length(text) == 0 {
 		return 0
 	}
 
@@ -55,4 +58,32 @@ func wordCount(text string) int {
 	}
 
 	return wordCount
+}
+
+func hash(text string) string {
+	hash := sha256.Sum256([]byte(text))
+	return hex.EncodeToString(hash[:])
+}
+
+func characterFreq(text string) map[string]int {
+	re := regexp.MustCompile(`\s+`)
+	text = re.ReplaceAllString(text, "")
+
+	countMap := make(map[string]int)
+	order := []rune{}
+
+	for _, ch := range text {
+		chStr := string(ch)
+		if _, exists := countMap[chStr]; !exists {
+			order = append(order, ch) // remember order
+		}
+		countMap[chStr]++
+	}
+
+	for _, ch := range order {
+		chStr := string(ch)
+		fmt.Printf("%c %d\n", ch, countMap[chStr])
+	}
+
+	return countMap
 }
