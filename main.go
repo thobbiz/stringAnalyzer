@@ -8,6 +8,7 @@ func main() {
 	router := gin.Default()
 	router.POST("/strings", createString)
 	router.GET("/strings/:string_value", getString)
+	router.DELETE("/strings/:string_value", deleteString)
 	router.GET("/strings", getStringWithParams)
 	router.Run(":7070")
 }
