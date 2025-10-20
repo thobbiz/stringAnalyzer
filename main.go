@@ -6,10 +6,11 @@ import (
 
 func main() {
 	router := gin.Default()
-	router.POST("/strings", createString)
-	router.GET("/strings/:string_value", getString)
-	router.DELETE("/strings/:string_value", deleteString)
-	router.GET("/strings", getStringWithParams)
+	router.POST("/strings", createStringHandler)
+	router.GET("/strings/:string_value", getStringHandler)
+	router.DELETE("/strings/:string_value", deleteStringHandler)
+	router.GET("/strings", getStringWithParamsHandler)
+	router.GET("/strings/filter-by-natural-language", naturalLanguageStringHandler)
 	router.Run(":7070")
 }
 

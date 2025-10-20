@@ -36,7 +36,7 @@ type getStringWithParamResult struct {
 }
 
 type naturalLanguageRequest struct {
-	Original      string                    `json:"original"`
+	Original      string                    `form:"query" json:"original"`
 	ParsedFilters getStringWithParamRequest `json:"parsed_filters"`
 }
 
@@ -50,7 +50,7 @@ type deleteStringRequest struct {
 	Text string `uri:"string_value" binding:"required"`
 }
 
-func createString(ctx *gin.Context) {
+func createStringHandler(ctx *gin.Context) {
 	var req stringRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		if err.Error() == ErrInvalidType {
@@ -91,7 +91,7 @@ func createString(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, arg)
 }
 
-func getString(ctx *gin.Context) {
+func getStringHandler(ctx *gin.Context) {
 	var req getStringRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
 		if err.Error() == ErrInvalidType {
@@ -112,7 +112,7 @@ func getString(ctx *gin.Context) {
 	}
 }
 
-func getStringWithParams(ctx *gin.Context) {
+func getStringWithParamsHandler(ctx *gin.Context) {
 	var req getStringWithParamRequest
 	var result getStringWithParamResult
 	if err := ctx.ShouldBindQuery(&req); err != nil {
@@ -130,17 +130,22 @@ func getStringWithParams(ctx *gin.Context) {
 		}
 	}
 
+	if len(result.Data) == 0 {
+		err := errors.New("")
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
 	result.Count = len(result.Data)
 	result.Filters = req
 
 	ctx.JSON(http.StatusOK, result)
 }
 
-func naturalLanguageString(ctx *gin.Context) {
+func naturalLanguageStringHandler(ctx *gin.Context) {
 	var req naturalLanguageRequest
 	var result naturalLanguageResponse
 
-	if err := ctx.ShouldBindUri(&req); err != nil {
+	if err := ctx.ShouldBindQuery(&req); err != nil {
 		if err.Error() == ErrInvalidType {
 			ctx.JSON(http.StatusUnprocessableEntity, errorResponse(err))
 			return
@@ -148,6 +153,8 @@ func naturalLanguageString(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
+
+	req.Original = ctx.Query("query")
 
 	filters := parseNaturalLanguageText(req.Original)
 	req.ParsedFilters = filters
@@ -164,7 +171,7 @@ func naturalLanguageString(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, result)
 }
 
-func deleteString(ctx *gin.Context) {
+func deleteStringHandler(ctx *gin.Context) {
 	var req deleteStringRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
 		if err.Error() == ErrInvalidType {
@@ -276,5 +283,13 @@ func valid(value ObjectString, req getStringWithParamRequest) bool {
 		return false
 	}
 
-	return true
+	return !isNill(req)
+}
+
+func isNill(req getStringWithParamRequest) bool {
+	if req.IsPalindrome == nil && req.MinLength == nil && req.MaxLength == nil && req.WordCount == nil && req.ContainsCharacter == "" {
+		return true
+	} else {
+		return false
+	}
 }
