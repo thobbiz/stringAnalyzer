@@ -3,7 +3,6 @@ package main
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
 	"regexp"
 	"strings"
 )
@@ -78,11 +77,6 @@ func characterFreq(text string) map[string]int {
 			order = append(order, ch) // remember order
 		}
 		countMap[chStr]++
-	}
-
-	for _, ch := range order {
-		chStr := string(ch)
-		fmt.Printf("%c %d\n", ch, countMap[chStr])
 	}
 
 	return countMap
